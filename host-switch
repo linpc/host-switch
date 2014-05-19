@@ -1,0 +1,150 @@
+#!/bin/sh
+
+HOSTS="/etc/hosts"
+
+BEGIN_PATTERN="# begin"
+
+MSG_HEAD="Local hosts setting"
+MSG_ON="\e[1;32mON\e[m"
+MSG_OFF="\e[1;31mOFF\e[m"
+
+
+check_root()
+{
+    if [ "`whoami`" != 'root' ]; then
+	printf "Please execute again with \e[1;31mroot\e[m.\n"
+	exit 1
+    fi
+}
+
+switch_off()
+{
+    group=$1
+    is_output=$2
+
+    begin_tag="# begin ${group} host setting"
+    end_tag="# end ${group} host setting"
+
+    if ! egrep -q "^${begin_tag}$" ${HOSTS}; then
+	if [ "${is_output}" -eq 1 ]; then
+	    printf "${MSG_HEAD} \e[33m${group}\e[m is already off\n"
+	fi
+    else
+	sed -e "/${begin_tag}/,/${end_tag}/s/^/# /" -i "" ${HOSTS}
+	if [ "${is_output}" -eq 1 ]; then
+	    printf "${MSG_HEAD} \e[33m${group}\e[m is on, turn it ${MSG_OFF} now\n"
+	fi
+    fi
+}
+
+switch_on()
+{
+    group=$1
+    is_output=$2
+
+    begin_tag="# begin ${group} host setting"
+    end_tag="# end ${group} host setting"
+
+    if egrep -q "^${begin_tag}$" ${HOSTS}; then
+	if [ "${is_output}" -eq 1 ]; then
+	    printf "${MSG_HEAD} \e[33m${group}\e[m is already on\n"
+	fi
+    else
+	sed -e "/${begin_tag}/,/${end_tag}/s/^# //" -i "" ${HOSTS}
+	if [ "${is_output}" -eq 1 ]; then
+	    printf "${MSG_HEAD} \e[33m${group}\e[m is off, turn it ${MSG_ON} now\n"
+	fi
+    fi
+}
+
+switch_all_off()
+{
+    except=$1
+
+    for group in ${groups}; do
+	if [ "$group" != "$except" ]; then
+	    if egrep -q "^${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}; then
+		switch_off ${group} 1
+	    fi
+	fi
+    done
+}
+
+look_up_group()
+{
+    is_output=$1
+
+    setting=`grep "${BEGIN_PATTERN}" ${HOSTS}`
+    for word in ${setting}; do
+	if ! echo "${word}" | egrep -q "^(#|begin|host|setting)$" ; then
+	    if [ "$groups" = '' ]; then
+		groups="${word}"
+	    else
+		groups="${groups} ${word}"
+	    fi
+	fi
+    done
+
+    if [ "${is_output}" -eq 1 ]; then
+	for group in ${groups}; do
+	    lookup=`egrep "${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}`
+	    printf " * \e[33m${group}\e[m setting is "
+	    if echo "${lookup}" | egrep -q "^# ${BEGIN_PATTERN}" ; then
+		printf "${MSG_OFF}\n"
+	    else
+		printf "${MSG_ON}\n"
+	    fi
+	done
+    fi
+}
+
+Usage()
+{
+    echo "Usage:"
+    echo "     ${0##*/}                     show the cureent setting"
+    echo "     ${0##*/} all-off             turn off all local settings (Use DNS)"
+    echo "     ${0##*/} on <group>          to switch <group> hosts setting ON"
+    echo ""
+    exit
+}
+
+groups=""
+if [ "$1" = '' ]; then
+    look_up_group 1
+    exit
+elif [ "$1" = '-h' -o "$1" = '--help' -o "$1" = 'help' ]; then
+    Usage
+else
+    # just parse groups list, don't output
+    look_up_group 0
+fi
+
+# The process should have "$1" when they come to here.
+# options:
+#   all-off     use default external DNS record
+#   ask         interactive selection
+#   on xxx	switch on xxx, and turn off any other records
+
+if [ "$1"  = "all-off" ]; then
+    check_root
+    switch_all_off ""
+    echo "Use global DNS setting now"
+elif [ "$1"  = "ask" ]; then
+    # interactive mode
+    echo "Not implemented yet"
+elif [ "$1"  = "on" ]; then
+    # we need to parse "$2" here, to see if its a valid record name in the $HOSTS file
+    check_root
+    if [ -z "$2" ]; then
+	printf "\e[1;31mError\e[m: Please provide group name\n"
+	exit 1
+    fi
+    if ! echo ${groups} | egrep -q "\b$2\b"; then
+	printf "\e[1;31mError\e[m: Not a valid group name\n"
+	exit 1
+    fi
+    switch_all_off "$2"
+    switch_on "$2" 1
+else
+    Usage
+fi
