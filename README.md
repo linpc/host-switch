@@ -17,7 +17,7 @@ Usage
         # 10.3.0.48 my2.example.com
         # # end STAGING host setting
 
-    __Note:__ that host setting name (_case-sesitive_, which are `DEV-my` and `STAGING` in the above case) should match on **begin** and **end** line.
+    __Note:__ host setting name (_case-sesitive_, which are `DEV-my` and `STAGING` in the above case) should match on **begin** and **end** line.
 
 2. Then you can use CLI to manage your hosts table switching:
 
