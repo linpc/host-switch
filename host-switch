@@ -100,22 +100,24 @@ look_up_group()
 
 Usage()
 {
+    exit_code=$1
+
     echo "Usage:"
     echo "     ${0##*/}                     show the cureent setting"
     echo "     ${0##*/} all-off             turn off all local settings (Use DNS)"
     echo "     ${0##*/} on <group>          to switch <group> hosts setting ON"
     echo ""
-    exit
+    exit $exit_code
 }
 
 groups=""
 if [ "$1" = '' ]; then
     look_up_group 1
-    exit
+    exit 0
 elif [ "$1" = '-h' -o "$1" = '--help' -o "$1" = 'help' ]; then
-    Usage
+    Usage 0
 else
-    # just parse groups list, don't output
+    # for each run, just parse groups list, don't output
     look_up_group 0
 fi
 
@@ -146,5 +148,5 @@ elif [ "$1"  = "on" ]; then
     switch_all_off "$2"
     switch_on "$2" 1
 else
-    Usage
+    Usage 1
 fi
