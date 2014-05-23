@@ -9,6 +9,18 @@ MSG_ON="\e[1;32mON\e[m"
 MSG_OFF="\e[1;31mOFF\e[m"
 
 
+Usage()
+{
+    exit_code=$1
+
+    echo "Usage:"
+    echo "     ${0##*/}                     show the cureent setting"
+    echo "     ${0##*/} all-off             turn off all local settings (Use DNS)"
+    echo "     ${0##*/} on <group>          to switch <group> hosts setting ON"
+    echo ""
+    exit $exit_code
+}
+
 check_root()
 {
     if [ "`whoami`" != 'root' ]; then
@@ -96,18 +108,6 @@ look_up_group()
 	    fi
 	done
     fi
-}
-
-Usage()
-{
-    exit_code=$1
-
-    echo "Usage:"
-    echo "     ${0##*/}                     show the cureent setting"
-    echo "     ${0##*/} all-off             turn off all local settings (Use DNS)"
-    echo "     ${0##*/} on <group>          to switch <group> hosts setting ON"
-    echo ""
-    exit $exit_code
 }
 
 groups=""
