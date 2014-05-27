@@ -86,8 +86,8 @@ look_up_group()
 {
     is_output=$1
 
-    setting=`grep "${BEGIN_PATTERN}" ${HOSTS}`
-    for word in ${setting}; do
+    setting_line=`grep "${BEGIN_PATTERN}" ${HOSTS}`
+    for word in ${setting_line}; do
 	if ! echo "${word}" | egrep -q "^(#|begin|host|setting)$" ; then
 	    if [ "$groups" = '' ]; then
 		groups="${word}"
