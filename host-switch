@@ -117,6 +117,28 @@ error()
     echo "$msg"
 }
 
+shell_input()
+{
+    while true; do
+	read -p 'host-switch >> ' input
+
+	if [ $? -eq 1 ]; then
+	    echo    # force newline
+	    exit 0
+	fi
+
+	if [ "$input" = 'exit' -o "$input" = 'quit' ]; then
+	    exit 0
+	fi
+
+	# do something
+    done
+}
+
+#
+# main routine
+#
+
 groups=""
 if [ "$1" = '' ]; then
     look_up_group 1
@@ -134,14 +156,14 @@ fi
 #   ask         interactive selection
 #   on xxx	switch on xxx, and turn off any other records
 
-if [ "$1"  = "all-off" ]; then
+if [ "$1" = "all-off" ]; then
     check_root
     switch_all_off ""
     echo "Use global DNS setting now"
-elif [ "$1"  = "ask" ]; then
+elif [ "$1" = "ask" ]; then
     # interactive mode
     echo "Not implemented yet"
-elif [ "$1"  = "on" ]; then
+elif [ "$1" = "on" ]; then
     # we need to parse "$2" here, to see if its a valid record name in the $HOSTS file
     check_root
     if [ -z "$2" ]; then
@@ -154,6 +176,9 @@ elif [ "$1"  = "on" ]; then
     fi
     switch_all_off "$2"
     switch_on "$2" 1
+elif [ "$1" = "shell" ]; then
+    check_root
+    shell_input
 else
     Usage 1
 fi
