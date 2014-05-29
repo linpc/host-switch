@@ -82,6 +82,19 @@ switch_all_off()
     done
 }
 
+print_out_group()
+{
+    for group in ${groups}; do
+	lookup=`egrep "${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}`
+	printf " * \e[33m${group}\e[m setting is "
+	if echo "${lookup}" | egrep -q "^# ${BEGIN_PATTERN}" ; then
+	    printf "${MSG_OFF}\n"
+	else
+	    printf "${MSG_ON}\n"
+	fi
+    done
+}
+
 look_up_group()
 {
     is_output=$1
@@ -98,15 +111,7 @@ look_up_group()
     done
 
     if [ "${is_output}" -eq 1 ]; then
-	for group in ${groups}; do
-	    lookup=`egrep "${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}`
-	    printf " * \e[33m${group}\e[m setting is "
-	    if echo "${lookup}" | egrep -q "^# ${BEGIN_PATTERN}" ; then
-		printf "${MSG_OFF}\n"
-	    else
-		printf "${MSG_ON}\n"
-	    fi
-	done
+	print_out_group
     fi
 }
 
@@ -115,6 +120,17 @@ error()
     msg=$1
     printf "\e[1;31mError\e[m: "
     echo "$msg"
+}
+
+shell_parse()
+{
+    if [ "$1" = 'clear' -o "$1" = 'cls' ]; then
+	clear
+    elif [ "$1" = 'list' ]; then
+	print_out_group
+    else
+	echo ' => Not implemented'
+    fi
 }
 
 shell_input()
@@ -131,7 +147,12 @@ shell_input()
 	    exit 0
 	fi
 
+	if [ -z "$input" ]; then
+	    continue
+	fi
+
 	# do something
+	shell_parse $input
     done
 }
 
