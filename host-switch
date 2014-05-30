@@ -18,7 +18,10 @@ Usage()
     echo "     ${0##*/} all-off             turn off all local settings (Use DNS)"
     echo "     ${0##*/} on <group>          to switch <group> hosts setting ON"
     echo ""
-    exit $exit_code
+
+    if [ $exit_code -ge 0 ]; then
+	exit $exit_code
+    fi
 }
 
 check_root()
@@ -128,6 +131,8 @@ shell_parse()
 	clear
     elif [ "$1" = 'list' ]; then
 	print_out_group
+    elif [ "$1" = 'help' ]; then
+	Usage -1
     else
 	echo ' => Not implemented'
     fi
@@ -174,16 +179,13 @@ fi
 # The process should have "$1" when they come to here.
 # options:
 #   all-off     use default external DNS record
-#   ask         interactive selection
+#   shell       interactive selection
 #   on xxx	switch on xxx, and turn off any other records
 
 if [ "$1" = "all-off" ]; then
     check_root
     switch_all_off ""
     echo "Use global DNS setting now"
-elif [ "$1" = "ask" ]; then
-    # interactive mode
-    echo "Not implemented yet"
 elif [ "$1" = "on" ]; then
     # we need to parse "$2" here, to see if its a valid record name in the $HOSTS file
     check_root
@@ -199,6 +201,7 @@ elif [ "$1" = "on" ]; then
     switch_on "$2" 1
 elif [ "$1" = "shell" ]; then
     check_root
+    # interactive mode
     shell_input
 else
     Usage 1
