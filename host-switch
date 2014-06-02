@@ -11,7 +11,7 @@ MSG_OFF="\e[1;31mOFF\e[m"
 
 Usage()
 {
-    exit_code=$1
+    local exit_code=$1
 
     echo "Usage:"
     echo "     ${0##*/}                     show the cureent setting"
@@ -75,11 +75,11 @@ list_add()
 
 switch_off()
 {
-    group=$1
-    is_output=$2
+    local group=$1
+    local is_output=$2
 
-    begin_tag="# begin ${group} host setting"
-    end_tag="# end ${group} host setting"
+    local begin_tag="# begin ${group} host setting"
+    local end_tag="# end ${group} host setting"
 
     if ! egrep -q "^${begin_tag}$" ${HOSTS}; then
 	if [ "${is_output}" -eq 1 ]; then
@@ -95,11 +95,11 @@ switch_off()
 
 switch_on()
 {
-    group=$1
-    is_output=$2
+    local group=$1
+    local is_output=$2
 
-    begin_tag="# begin ${group} host setting"
-    end_tag="# end ${group} host setting"
+    local begin_tag="# begin ${group} host setting"
+    local end_tag="# end ${group} host setting"
 
     if egrep -q "^${begin_tag}$" ${HOSTS}; then
 	if [ "${is_output}" -eq 1 ]; then
@@ -115,7 +115,7 @@ switch_on()
 
 switch_all_off()
 {
-    except=$1
+    local except=$1
 
     for group in ${groups}; do
 	if [ "$group" != "$except" ]; then
@@ -129,7 +129,7 @@ switch_all_off()
 print_out_group()
 {
     for group in ${groups}; do
-	lookup=`egrep "${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}`
+	local lookup=`egrep "${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}`
 	printf " * \e[33m${group}\e[m setting is "
 	if echo "${lookup}" | egrep -q "^# ${BEGIN_PATTERN}" ; then
 	    printf "${MSG_OFF}\n"
@@ -141,9 +141,9 @@ print_out_group()
 
 look_up_group()
 {
-    is_output=$1
+    local is_output=$1
 
-    setting_line=`grep "${BEGIN_PATTERN}" ${HOSTS}`
+    local setting_line=`grep "${BEGIN_PATTERN}" ${HOSTS}`
     for word in ${setting_line}; do
 	if ! echo "${word}" | egrep -q "^(#|begin|host|setting)$" ; then
 	    list_add 'groups' $word
@@ -157,7 +157,7 @@ look_up_group()
 
 error()
 {
-    msg=$1
+    local msg=$1
     printf "\e[1;31mError\e[m: "
     echo "$msg"
 }
