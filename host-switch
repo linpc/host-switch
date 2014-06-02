@@ -32,6 +32,47 @@ check_root()
     fi
 }
 
+# return value:
+# 0: found item in list
+# -1: not found
+in_list()
+{
+    local list_name=$1
+    local entry=$2
+
+    local list=''
+    eval list=\$$list_name
+    local is_found=0
+
+    for item in ${list}; do
+	if [ "$item" = "${entry}" ]; then
+	    is_found=1
+	    break
+	fi
+    done
+
+    return $((${is_found} - 1))
+}
+
+list_add()
+{
+    local list_name=$1
+    local entry=$2
+
+    if in_list ${list_name} ${entry} ; then
+        return
+    fi
+
+    local list=''
+    eval list=\$$list_name
+
+    if [ "$list" = '' ]; then
+	eval $list_name="${entry}"
+    else
+	eval $list_name=\"${list} ${entry}\"
+    fi
+}
+
 switch_off()
 {
     group=$1
@@ -105,11 +146,7 @@ look_up_group()
     setting_line=`grep "${BEGIN_PATTERN}" ${HOSTS}`
     for word in ${setting_line}; do
 	if ! echo "${word}" | egrep -q "^(#|begin|host|setting)$" ; then
-	    if [ "$groups" = '' ]; then
-		groups="${word}"
-	    else
-		groups="${groups} ${word}"
-	    fi
+	    list_add 'groups' $word
 	fi
     done
 
@@ -193,7 +230,7 @@ elif [ "$1" = "on" ]; then
 	error "Please provide group name"
 	exit 1
     fi
-    if ! echo ${groups} | egrep -q "\b$2\b"; then
+    if ! in_list 'groups' "$2" ; then
 	error "Not a valid group name"
 	exit 1
     fi
