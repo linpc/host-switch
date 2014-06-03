@@ -32,6 +32,10 @@ check_root()
     fi
 }
 
+#################################
+# list operations
+#################################
+
 # return value:
 # 0: found item in list
 # -1: not found
@@ -72,6 +76,10 @@ list_add()
 	eval $list_name=\"${list} ${entry}\"
     fi
 }
+
+#################################
+# Setting modifying functions
+#################################
 
 switch_off()
 {
@@ -200,6 +208,10 @@ error()
     echo "$msg"
 }
 
+#################################
+# shell implementations
+#################################
+
 shell_parse()
 {
     if [ "$1" = 'clear' -o "$1" = 'cls' ]; then
@@ -236,9 +248,9 @@ shell_input()
     done
 }
 
-#
+#################################
 # main routine
-#
+#################################
 
 sets=""
 groups=""
