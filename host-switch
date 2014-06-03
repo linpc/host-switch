@@ -126,17 +126,49 @@ switch_all_off()
     done
 }
 
-print_out_group()
+#################################
+# output setting functions
+#################################
+
+print_out_test_group()
 {
-    for group in ${groups}; do
-	local lookup=`egrep "${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}`
-	printf " * \e[33m${group}\e[m setting is "
-	if echo "${lookup}" | egrep -q "^# ${BEGIN_PATTERN}" ; then
-	    printf "${MSG_OFF}\n"
-	else
-	    printf "${MSG_ON}\n"
-	fi
+    local group=$1
+
+    if echo ${group} | grep -q ':'; then
+	printf "   * \e[33m%s\e[m setting is " `echo ${group} | cut -d: -f 2`
+    else
+	printf "   * \e[33m%s\e[m setting is " ${group}
+    fi
+    local lookup=`egrep "${BEGIN_PATTERN} $1 host setting$" ${HOSTS}`
+    if echo "${lookup}" | egrep -q "^# ${BEGIN_PATTERN}" ; then
+	printf "${MSG_OFF}\n"
+    else
+	printf "${MSG_ON}\n"
+    fi
+}
+
+print_out_test_set()
+{
+    local set=$1
+    printf " - set: \e[1;35m${set}\e[m\n"
+    for group in `echo ${groups} | tr ' ' \\\n | egrep "^${set}:"`; do
+	print_out_test_group ${group}
     done
+}
+
+print_out_setting()
+{
+    for set in ${sets}; do
+	print_out_test_set ${set}
+    done
+
+    local uncategorized=`echo ${groups} | tr ' ' \\\n | grep -v ':'`
+    if [ ! -z "${uncategorized}" ]; then
+	printf " - \e[1;35muncategorized\e[m\n"
+	for group in ${uncategorized}; do
+	    print_out_test_group ${group}
+	done
+    fi
 }
 
 look_up_group()
@@ -147,11 +179,17 @@ look_up_group()
     for word in ${setting_line}; do
 	if ! echo "${word}" | egrep -q "^(#|begin|host|setting)$" ; then
 	    list_add 'groups' $word
+
+	    # collect sets information
+	    if echo "${word}" | grep -q ':'; then
+		local set=`echo ${word} | cut -d: -f 1`
+		list_add 'sets' $set
+	    fi
 	fi
     done
 
     if [ "${is_output}" -eq 1 ]; then
-	print_out_group
+	print_out_setting
     fi
 }
 
@@ -167,7 +205,7 @@ shell_parse()
     if [ "$1" = 'clear' -o "$1" = 'cls' ]; then
 	clear
     elif [ "$1" = 'list' ]; then
-	print_out_group
+	print_out_setting
     elif [ "$1" = 'help' ]; then
 	Usage -1
     else
@@ -202,7 +240,9 @@ shell_input()
 # main routine
 #
 
+sets=""
 groups=""
+
 if [ "$1" = '' ]; then
     look_up_group 1
     exit 0
