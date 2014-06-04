@@ -252,17 +252,34 @@ shell_input()
 # main routine
 #################################
 
+# global variables
 sets=""
 groups=""
 
-if [ "$1" = '' ]; then
-    look_up_group 1
-    exit 0
-elif [ "$1" = '-h' -o "$1" = '--help' -o "$1" = 'help' ]; then
+# initialize
+if [ "$1" = '-h' -o "$1" = '--help' -o "$1" = 'help' ]; then
     Usage 0
 else
-    # for each run, just parse groups list, don't output
     look_up_group 0
+fi
+
+# list/show operation
+if [ "$1" = '' ]; then
+    print_out_setting
+    exit 0
+elif [ "$1" = 'show' -o "$1" = 'list' ]; then
+    if [ "$2" = '' ]; then
+	print_out_setting
+	exit 0
+    else
+	print_out_test_set $2
+	exit 0
+    fi
+elif [ "$1" != 'all-off' -a "$1" != 'on' -a "$1" != 'shell' ]; then
+    Usage 1
+else
+#    check_root
+    printf ""
 fi
 
 # The process should have "$1" when they come to here.
@@ -272,12 +289,10 @@ fi
 #   on xxx	switch on xxx, and turn off any other records
 
 if [ "$1" = "all-off" ]; then
-    check_root
     switch_all_off ""
     echo "Use global DNS setting now"
 elif [ "$1" = "on" ]; then
     # we need to parse "$2" here, to see if its a valid record name in the $HOSTS file
-    check_root
     if [ -z "$2" ]; then
 	error "Please provide group name"
 	exit 1
@@ -289,9 +304,10 @@ elif [ "$1" = "on" ]; then
     switch_all_off "$2"
     switch_on "$2" 1
 elif [ "$1" = "shell" ]; then
-    check_root
     # interactive mode
     shell_input
 else
-    Usage 1
+    # should not go here
+    error "Fatal error"
+    exit 1
 fi
