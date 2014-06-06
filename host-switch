@@ -121,6 +121,22 @@ switch_on()
     fi
 }
 
+switch_off_set()
+{
+    local set=$1
+    local except=$2
+
+    for group in ${groups}; do
+	if [ "$group" != "$except" ]; then
+	    if echo ${group} | egrep -q "^${set}:"; then
+		if egrep -q "^${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}; then
+		    switch_off ${group} 1
+		fi
+	    fi
+	fi
+    done
+}
+
 switch_all_off()
 {
     local except=$1
@@ -294,12 +310,24 @@ main()
 	    error "Please provide group name"
 	    exit 1
 	fi
-	if ! in_list 'groups' "$2" ; then
+
+	local query_group=$2
+	if [ ! -z "$3" ]; then
+	    query_group="${2}:${3}"
+	fi
+
+	if ! in_list 'groups' "${query_group}" ; then
 	    error "Not a valid group name"
 	    exit 1
 	fi
-	switch_all_off "$2"
-	switch_on "$2" 1
+
+	if [ ! -z "$3" ]; then
+	    switch_off_set "$2" "${query_group}"
+	#else
+	#    switch_all_off "$2"
+	fi
+
+	switch_on "${query_group}" 1
     elif [ "$1" = "shell" ]; then
 	# interactive mode
 	shell_input
