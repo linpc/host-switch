@@ -174,7 +174,7 @@ print_out_test_group()
 print_out_test_set()
 {
     local set=$1
-    printf " - set: \e[1;35m${set}\e[m\n"
+    printf " - set: \e[1;33;46m ${set} \e[m\n"
     for group in `echo ${groups} | tr ' ' \\\n | egrep "^${set}:"`; do
 	print_out_test_group ${group}
     done
@@ -302,8 +302,20 @@ main()
     #   on xxx	switch on xxx, and turn off any other records
 
     if [ "$1" = "all-off" ]; then
-	switch_all_off ""
-	echo "Use global DNS setting now"
+	if [ -z "$2" ]; then
+	    error "Please provide set name"
+	    exit 1
+	fi
+
+	if ! in_list 'sets' "${2}" ; then
+	    error "Not a valid set name"
+	    exit 1
+	fi
+
+	#switch_all_off ""
+	switch_off_set "$2" ""
+	printf "Set \e[1;33;46m ${2} \e[m "
+	echo "is using global DNS setting now"
     elif [ "$1" = "on" ]; then
 	# we need to parse "$2" here, to see if its a valid record name in the $HOSTS file
 	if [ -z "$2" ]; then
