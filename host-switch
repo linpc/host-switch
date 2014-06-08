@@ -15,8 +15,8 @@ Usage()
 
     echo "Usage:"
     echo "     ${0##*/}                     show the cureent setting"
-    echo "     ${0##*/} all-off             turn off all local settings (Use DNS)"
-    echo "     ${0##*/} on <group>          to switch <group> hosts setting ON"
+    echo "     ${0##*/} all-off <set>       turn off all local settings (Use DNS)"
+    echo "     ${0##*/} on <set> <group>    to switch <group> hosts setting ON"
     echo ""
 
     if [ $exit_code -ge 0 ]; then
