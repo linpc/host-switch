@@ -150,6 +150,15 @@ switch_all_off()
     done
 }
 
+test_on_group_status()
+{
+    local group=$1
+    local lookup=`egrep "${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}`
+
+    echo "${lookup}" | egrep -q "^${BEGIN_PATTERN}"
+    return $?
+}
+
 #################################
 # output setting functions
 #################################
@@ -163,11 +172,11 @@ print_out_test_group()
     else
 	printf "   * \e[33m%s\e[m setting is " ${group}
     fi
-    local lookup=`egrep "${BEGIN_PATTERN} $1 host setting$" ${HOSTS}`
-    if echo "${lookup}" | egrep -q "^# ${BEGIN_PATTERN}" ; then
-	printf "${MSG_OFF}\n"
-    else
+
+    if test_on_group_status ${group}; then
 	printf "${MSG_ON}\n"
+    else
+	printf "${MSG_OFF}\n"
     fi
 }
 
