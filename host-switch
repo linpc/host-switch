@@ -159,6 +159,20 @@ test_on_group_status()
     return $?
 }
 
+test_set_setting()
+{
+    local set=$1
+    local setting=""
+
+    for group in `echo ${groups} | tr ' ' \\\n | egrep "^${set}:"`; do
+	if test_on_group_status ${group}; then
+	    setting="${group}"
+	fi
+    done
+
+    echo ${setting}
+}
+
 #################################
 # output setting functions
 #################################
