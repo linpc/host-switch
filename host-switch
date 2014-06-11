@@ -78,6 +78,27 @@ list_add()
 }
 
 #################################
+# validation
+#################################
+
+validate_set()
+{
+    local set=$1
+
+    if [ -z "${set}" ]; then
+	error "Please provide set name"
+	return 1
+    fi
+
+    if ! in_list 'sets' "${set}" ; then
+	error "Not a valid set name"
+	return 1
+    fi
+
+    return 0
+}
+
+#################################
 # Setting modifying functions
 #################################
 
@@ -325,13 +346,7 @@ main()
     #   on xxx	switch on xxx, and turn off any other records
 
     if [ "$1" = "all-off" ]; then
-	if [ -z "$2" ]; then
-	    error "Please provide set name"
-	    exit 1
-	fi
-
-	if ! in_list 'sets' "${2}" ; then
-	    error "Not a valid set name"
+	if ! validate_set "$2"; then
 	    exit 1
 	fi
 
