@@ -389,11 +389,9 @@ main()
 	local query_group=$2
 	if [ ! -z "$3" ]; then
 	    query_group="${2}:${3}"
-	fi
-
-	if [ ! -z "$3" ]; then
 	    switch_off_set "$2" "${query_group}"
-	#else
+	elif echo ${query_group} | grep -q ':'; then
+	    switch_off_set `echo ${query_group} | cut -d: -f1` "${query_group}"
 	#    switch_all_off "$2"
 	fi
 
