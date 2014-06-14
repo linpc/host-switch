@@ -229,7 +229,7 @@ print_out_test_group()
     local group=$1
 
     if echo ${group} | grep -q ':'; then
-	printf "   * \e[33m%s\e[m setting is " `echo ${group} | cut -d: -f 2`
+	printf "   * \e[33m%s\e[m setting is " `echo ${group} | cut -d: -f2`
     else
 	printf "   * \e[33m%s\e[m setting is " ${group}
     fi
@@ -276,8 +276,7 @@ look_up_group()
 
 	    # collect sets information
 	    if echo "${word}" | grep -q ':'; then
-		local set=`echo ${word} | cut -d: -f 1`
-		list_add 'sets' $set
+		list_add 'sets' `echo ${word} | cut -d: -f1`
 	    fi
 	fi
     done
