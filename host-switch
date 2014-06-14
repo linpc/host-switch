@@ -357,6 +357,10 @@ main()
 	    print_out_setting
 	    exit 0
 	else
+	    if ! validate_set "$2"; then
+		exit 1
+	    fi
+
 	    print_out_test_set $2
 	    exit 0
 	fi
