@@ -12,11 +12,13 @@ MSG_OFF="\e[1;31mOFF\e[m"
 Usage()
 {
     local exit_code=$1
+    local exe=${0##*/}
 
     echo "Usage:"
-    echo "     ${0##*/}                     show the cureent setting"
-    echo "     ${0##*/} all-off <set>       turn off all local settings (Use DNS)"
-    echo "     ${0##*/} on <set> <group>    to switch <group> hosts setting ON"
+    echo "     ${exe}                     show current setting"
+    echo "     ${exe} list <set>          show current setting of specific set"
+    echo "     ${exe} all-off <set>       turn off all local settings (Use DNS)"
+    echo "     ${exe} on <set> <group>    to switch <group> hosts setting ON"
     echo ""
 
     if [ $exit_code -ge 0 ]; then
