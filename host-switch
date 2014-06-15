@@ -21,6 +21,7 @@ Usage()
     echo "Usage:"
     printf "     ${c_opt}${exe}${c_ori}                     show current setting\n"
     printf "     ${c_opt}${exe} list${c_ori} <${c_arg}set${c_ori}>          show current setting of specific set\n"
+    printf "     ${c_opt}${exe} dig${c_ori} <${c_arg}set${c_ori}>           show current host table of specific set\n"
     printf "     ${c_opt}${exe} all-off${c_ori} <${c_arg}set${c_ori}>       turn off all local settings (Use DNS)\n"
     printf "     ${c_opt}${exe} on${c_ori} <${c_arg}set${c_ori}> <${c_arg}group${c_ori}>    to switch <group> hosts setting ON\n"
     echo ""
@@ -368,6 +369,22 @@ main()
 	    print_out_test_set $2
 	    exit 0
 	fi
+    elif [ "$1" = 'dig' ]; then
+	if ! validate_set "$2"; then
+	    exit 1
+	fi
+
+	local active=`test_set_setting "$2"`
+	if [ ! -z "${active}" ]; then
+	    local begin="^${BEGIN_PATTERN} ${active} host setting$"
+	    local end="^# end ${active} host setting$"
+
+	    cat ${HOSTS} | sed -n "/${begin}/,/${end}/p" | grep -v '^#'
+	else
+	    echo "use global DNS setting now"
+	fi
+
+	exit 0
     elif [ "$1" != 'all-off' -a "$1" != 'on' -a "$1" != 'shell' ]; then
 	Usage 1
     else
