@@ -14,11 +14,15 @@ Usage()
     local exit_code=$1
     local exe=${0##*/}
 
+    local c_opt="\e[33m"
+    local c_arg="\e[1;4;32m"
+    local c_ori="\e[m"
+
     echo "Usage:"
-    echo "     ${exe}                     show current setting"
-    echo "     ${exe} list <set>          show current setting of specific set"
-    echo "     ${exe} all-off <set>       turn off all local settings (Use DNS)"
-    echo "     ${exe} on <set> <group>    to switch <group> hosts setting ON"
+    printf "     ${c_opt}${exe}${c_ori}                     show current setting\n"
+    printf "     ${c_opt}${exe} list${c_ori} <${c_arg}set${c_ori}>          show current setting of specific set\n"
+    printf "     ${c_opt}${exe} all-off${c_ori} <${c_arg}set${c_ori}>       turn off all local settings (Use DNS)\n"
+    printf "     ${c_opt}${exe} on${c_ori} <${c_arg}set${c_ori}> <${c_arg}group${c_ori}>    to switch <group> hosts setting ON\n"
     echo ""
 
     if [ $exit_code -ge 0 ]; then
