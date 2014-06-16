@@ -381,12 +381,29 @@ shell_parse()
 {
     if [ "$1" = 'clear' -o "$1" = 'cls' ]; then
 	clear
-    elif [ "$1" = 'list' ]; then
-	print_out_setting
+	return $?
     elif [ "$1" = 'help' ]; then
 	Usage -1
+	return 0
+    elif [ "$1" = 'list' ]; then
+	shift
+	do_list $@
+	return $?
+    elif [ "$1" = 'dig' ]; then
+	shift
+	do_dig $@
+	return $?
+    elif [ "$1" = 'all-off' ]; then
+	shift
+	do_all_off $@
+	return $?
+    elif [ "$1" = 'on' ]; then
+	shift
+	do_on $@
+	return $?
     else
 	echo ' => Not implemented'
+	return 1
     fi
 }
 
@@ -410,6 +427,7 @@ shell_input()
 
 	# do something
 	shell_parse $input
+	printf "[%d] " $?
     done
 }
 
