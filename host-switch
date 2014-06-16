@@ -191,19 +191,6 @@ switch_off_set()
     done
 }
 
-switch_all_off()
-{
-    local except=$1
-
-    for group in ${groups}; do
-	if [ "$group" != "$except" ]; then
-	    if egrep -q "^${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}; then
-		switch_off ${group} 1
-	    fi
-	fi
-    done
-}
-
 test_on_group_status()
 {
     local group=$1
@@ -344,7 +331,6 @@ do_all_off()
 	return 1
     fi
 
-    #switch_all_off ""
     switch_off_set "$1" ""
     printf "Set \e[1;33;46m ${1} \e[m "
     echo "is using global DNS setting now"
@@ -365,7 +351,6 @@ do_on()
 	switch_off_set "$1" "${query_group}"
     elif echo ${query_group} | grep -q ':'; then
 	switch_off_set `echo ${query_group} | cut -d: -f1` "${query_group}"
-	#    switch_all_off "$1"
     fi
 
     switch_on "${query_group}" 1
