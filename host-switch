@@ -22,8 +22,8 @@ Usage()
     printf "     ${c_opt}${exe}${c_ori}                     show current setting\n"
     printf "     ${c_opt}${exe} list${c_ori} <${c_arg}set${c_ori}>          show current setting of specific set\n"
     printf "     ${c_opt}${exe} dig${c_ori} <${c_arg}set${c_ori}>           show current host table of specific set\n"
-    printf "     ${c_opt}${exe} all-off${c_ori} <${c_arg}set${c_ori}>       turn off all local settings (Use DNS)\n"
-    printf "     ${c_opt}${exe} on${c_ori} <${c_arg}set${c_ori}> <${c_arg}group${c_ori}>    to switch <group> hosts setting ON\n"
+    printf "     ${c_opt}${exe} all-off${c_ori} <${c_arg}set${c_ori}>       (root) turn off all local settings (Use DNS)\n"
+    printf "     ${c_opt}${exe} on${c_ori} <${c_arg}set${c_ori}> <${c_arg}group${c_ori}>    (root) to switch <group> hosts setting ON\n"
     echo ""
 
     if [ $exit_code -ge 0 ]; then
@@ -301,6 +301,79 @@ error()
 }
 
 #################################
+# cmd handling
+#################################
+
+do_list()
+{
+    if [ "$1" = '' ]; then
+	print_out_setting
+	return 0
+    else
+	if ! validate_set "$1"; then
+	    return 1
+	fi
+
+	print_out_test_set $1
+	return 0
+    fi
+}
+
+do_dig()
+{
+    if ! validate_set "$1"; then
+	return 1
+    fi
+
+    local active=`test_set_setting "$1"`
+    if [ ! -z "${active}" ]; then
+	local begin="^${BEGIN_PATTERN} ${active} host setting$"
+	local end="^# end ${active} host setting$"
+
+	cat ${HOSTS} | sed -n "/${begin}/,/${end}/p" | grep -v '^#'
+    else
+	echo "use global DNS setting now"
+    fi
+
+    return 0
+}
+
+do_all_off()
+{
+    if ! validate_set "$1"; then
+	return 1
+    fi
+
+    #switch_all_off ""
+    switch_off_set "$1" ""
+    printf "Set \e[1;33;46m ${1} \e[m "
+    echo "is using global DNS setting now"
+
+    return 0
+}
+
+do_on()
+{
+    # we need to parse "$1" here, to see if its a valid record name in the $HOSTS file
+    if ! validate_group "$1" "$2"; then
+	return 1
+    fi
+
+    local query_group=$1
+    if [ ! -z "$2" ]; then
+	query_group="${1}:${2}"
+	switch_off_set "$1" "${query_group}"
+    elif echo ${query_group} | grep -q ':'; then
+	switch_off_set `echo ${query_group} | cut -d: -f1` "${query_group}"
+	#    switch_all_off "$1"
+    fi
+
+    switch_on "${query_group}" 1
+
+    return 0
+}
+
+#################################
 # shell implementations
 #################################
 
@@ -358,70 +431,29 @@ main()
 	print_out_setting
 	exit 0
     elif [ "$1" = 'show' -o "$1" = 'list' ]; then
-	if [ "$2" = '' ]; then
-	    print_out_setting
-	    exit 0
-	else
-	    if ! validate_set "$2"; then
-		exit 1
-	    fi
-
-	    print_out_test_set $2
-	    exit 0
-	fi
+	shift
+	do_list $@
+	exit $?
     elif [ "$1" = 'dig' ]; then
-	if ! validate_set "$2"; then
-	    exit 1
-	fi
-
-	local active=`test_set_setting "$2"`
-	if [ ! -z "${active}" ]; then
-	    local begin="^${BEGIN_PATTERN} ${active} host setting$"
-	    local end="^# end ${active} host setting$"
-
-	    cat ${HOSTS} | sed -n "/${begin}/,/${end}/p" | grep -v '^#'
-	else
-	    echo "use global DNS setting now"
-	fi
-
-	exit 0
+	shift
+	do_dig $@
+	exit $?
     elif [ "$1" != 'all-off' -a "$1" != 'on' -a "$1" != 'shell' ]; then
 	Usage 1
     else
 	check_root
     fi
 
-    # The process should have "$1" when they come to here.
-    # options:
-    #   all-off     use default external DNS record
-    #   shell       interactive selection
-    #   on xxx	switch on xxx, and turn off any other records
+    # The process should has "$1" when it comes to here.
 
     if [ "$1" = "all-off" ]; then
-	if ! validate_set "$2"; then
-	    exit 1
-	fi
-
-	#switch_all_off ""
-	switch_off_set "$2" ""
-	printf "Set \e[1;33;46m ${2} \e[m "
-	echo "is using global DNS setting now"
+	shift
+	do_all_off $@
+	exit $?
     elif [ "$1" = "on" ]; then
-	# we need to parse "$2" here, to see if its a valid record name in the $HOSTS file
-	if ! validate_group "$2" "$3"; then
-	    exit 1
-	fi
-
-	local query_group=$2
-	if [ ! -z "$3" ]; then
-	    query_group="${2}:${3}"
-	    switch_off_set "$2" "${query_group}"
-	elif echo ${query_group} | grep -q ':'; then
-	    switch_off_set `echo ${query_group} | cut -d: -f1` "${query_group}"
-	#    switch_all_off "$2"
-	fi
-
-	switch_on "${query_group}" 1
+	shift
+	do_on $@
+	exit $?
     elif [ "$1" = "shell" ]; then
 	# interactive mode
 	shell_input
