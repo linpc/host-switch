@@ -367,7 +367,7 @@ shell_parse()
     if [ "$1" = 'clear' -o "$1" = 'cls' ]; then
 	clear
 	return $?
-    elif [ "$1" = 'help' ]; then
+    elif [ "$1" = 'help' -o "$1" = '?' ]; then
 	Usage -1
 	return 0
     elif [ "$1" = 'list' ]; then
@@ -395,7 +395,8 @@ shell_parse()
 shell_input()
 {
     while true; do
-	read -p 'host-switch >> ' input
+	printf "\e[32mhost-switch\e[m"
+	read -p ' >> ' input
 
 	if [ $? -eq 1 ]; then
 	    echo    # force newline
@@ -412,7 +413,11 @@ shell_input()
 
 	# do something
 	shell_parse $input
-	printf "[%d] " $?
+	if [ $? -eq 0 ]; then
+	    printf "[\e[32mo\e[m] "
+	else
+	    printf "[\e[31mx\e[m] "
+	fi
     done
 }
 
