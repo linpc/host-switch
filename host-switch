@@ -1,13 +1,13 @@
 #!/bin/sh
 
-HOSTS="/etc/hosts"
+readonly HOSTS="/etc/hosts"
 
-BEGIN_PATTERN="# begin"
+readonly BEGIN_PATTERN="# begin"
 
-MSG_HEAD="Local hosts setting"
-MSG_GDNS="using global DNS setting now"
-MSG_ON="\e[1;32mON\e[m"
-MSG_OFF="\e[1;31mOFF\e[m"
+readonly MSG_HEAD="Local hosts setting"
+readonly MSG_GDNS="using global DNS setting now"
+readonly MSG_ON="\e[1;32mON\e[m"
+readonly MSG_OFF="\e[1;31mOFF\e[m"
 
 
 Usage()
