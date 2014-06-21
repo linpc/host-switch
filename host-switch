@@ -136,13 +136,23 @@ validate_group()
 # Setting modifying functions
 #################################
 
+begin_line()
+{
+    echo "# begin ${1} host setting"
+}
+
+end_line()
+{
+    echo "# end ${1} host setting"
+}
+
 switch_off()
 {
     local group=$1
     local is_output=$2
 
-    local begin_tag="# begin ${group} host setting"
-    local end_tag="# end ${group} host setting"
+    local begin_tag=`begin_line ${group}`
+    local end_tag=`end_line ${group}`
 
     if ! egrep -q "^${begin_tag}$" ${HOSTS}; then
 	if [ "${is_output}" -eq 1 ]; then
@@ -161,8 +171,8 @@ switch_on()
     local group=$1
     local is_output=$2
 
-    local begin_tag="# begin ${group} host setting"
-    local end_tag="# end ${group} host setting"
+    local begin_tag=`begin_line ${group}`
+    local end_tag=`end_line ${group}`
 
     if egrep -q "^${begin_tag}$" ${HOSTS}; then
 	if [ "${is_output}" -eq 1 ]; then
@@ -184,7 +194,9 @@ switch_off_set()
     for group in ${groups}; do
 	if [ "$group" != "$except" ]; then
 	    if echo ${group} | egrep -q "^${set}:"; then
-		if egrep -q "^${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}; then
+		local begin_tag=`begin_line ${group}`
+
+		if egrep -q "^${begin_tag}$" ${HOSTS}; then
 		    switch_off ${group} 1
 		fi
 	    fi
@@ -195,7 +207,8 @@ switch_off_set()
 test_on_group_status()
 {
     local group=$1
-    local lookup=`egrep "${BEGIN_PATTERN} ${group} host setting$" ${HOSTS}`
+    local begin_tag=`begin_line ${group}`
+    local lookup=`egrep "${begin_tag}$" ${HOSTS}`
 
     echo "${lookup}" | egrep -q "^${BEGIN_PATTERN}"
     return $?
@@ -315,8 +328,10 @@ do_dig()
 
     local active=`test_set_setting "$1"`
     if [ ! -z "${active}" ]; then
-	local begin="^${BEGIN_PATTERN} ${active} host setting$"
-	local end="^# end ${active} host setting$"
+	local begin_tag=`begin_line ${active}`
+	local end_tag=`end_line ${active}`
+	local begin="^${begin_tag}$"
+	local end="^${end_tag}$"
 
 	cat ${HOSTS} | sed -n "/${begin}/,/${end}/p" | grep -v '^#'
     else
