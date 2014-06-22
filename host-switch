@@ -403,7 +403,7 @@ shell_parse()
 	do_on $@
 	return $?
     else
-	echo ' => Not implemented'
+	error "unknown command"
 	return 1
     fi
 }
