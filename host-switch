@@ -419,7 +419,8 @@ shell_input()
 	    exit 0
 	fi
 
-	if [ "$input" = 'exit' -o "$input" = 'quit' ]; then
+	if [ "$input" = 'exit' -o "$input" = 'quit' -o "$input" = 'bye' ]; then
+	    echo 'bye!'
 	    exit 0
 	fi
 
