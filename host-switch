@@ -285,11 +285,18 @@ look_up_group()
     local setting_line=`grep "${BEGIN_PATTERN}" ${HOSTS}`
     for word in ${setting_line}; do
 	if ! echo "${word}" | egrep -q "^(#|begin|host|setting)$" ; then
-	    list_add 'groups' $word
+	    local end_tag=`end_line ${word}`
+	    if grep -q "${end_tag}" ${HOSTS}; then
+		list_add 'groups' $word
 
-	    # collect sets information
-	    if echo "${word}" | grep -q ':'; then
-		list_add 'sets' `echo ${word} | cut -d: -f1`
+		# collect sets information
+		if echo "${word}" | grep -q ':'; then
+		    list_add 'sets' `echo ${word} | cut -d: -f1`
+		fi
+	    else
+		# parse error, force quit
+		error "begin_tag and end_tag for ${word} not match"
+		exit 1
 	    fi
 	fi
     done
