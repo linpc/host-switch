@@ -402,7 +402,7 @@ shell_parse()
 	shift
 	do_list $@
 	return $?
-    elif [ "$1" = 'dig' ]; then
+    elif [ "$1" = 'dig' -o "$1" = 'drill' ]; then
 	shift
 	do_dig $@
 	return $?
@@ -476,7 +476,7 @@ main()
 	shift
 	do_list $@
 	exit $?
-    elif [ "$1" = 'dig' ]; then
+    elif [ "$1" = 'dig' -o "$1" = 'drill' ]; then
 	shift
 	do_dig $@
 	exit $?
