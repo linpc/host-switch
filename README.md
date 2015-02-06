@@ -20,7 +20,7 @@ Definition
 
 Usage
 ----
-0. For example, I have two host set in my daily development, say _foo_ and _bar_.
+0. For example, I have two host-set in my daily development, say _foo_ and _bar_.
 
 1. So I prepare my `/etc/hosts` file as the following formats:
 
