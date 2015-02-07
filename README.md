@@ -15,7 +15,7 @@ Commands
 Definition
 ----
 * __GROUP__: indicate one specific setting of some hostnames
-* __SET__: indicate an aggregation of hosts. You can define several setting __*group*__ for one __*set*__, but only ONE __*group*__ setting can be activated simultaneously.
+* __SET__: indicate an aggregation of hosts. You can define several setting __*group*__ for one __*set*__, but only one __*group*__ setting can be activated simultaneously.
 
 
 Usage
