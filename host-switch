@@ -116,7 +116,6 @@ validate_group()
     local arg_1=$1
     local arg_2=$2
 
-
     # we need to parse "$2" here, to see if its a valid record name in the $HOSTS file
 
     if [ -z "$arg_1" ]; then
