@@ -487,15 +487,15 @@ main()
 
     # The process should has "$1" when it comes to here.
 
-    if [ "$1" = "all-off" ]; then
+    if [ "$1" = 'all-off' ]; then
 	shift
 	do_all_off $@
 	exit $?
-    elif [ "$1" = "on" ]; then
+    elif [ "$1" = 'on' ]; then
 	shift
 	do_on $@
 	exit $?
-    elif [ "$1" = "shell" ]; then
+    elif [ "$1" = 'shell' ]; then
 	# interactive mode
 	shell_input
     else
