@@ -69,7 +69,7 @@ Usage
 
         $ sudo host-switch all-off foo
 
-    Are you lazy to type password for `sudo`? Then you can use the shell feature. After the shell prompt, all the commands are the same as the CLI mode, but no need to type the script name (*i.e.*, `host-switch` should be stripped).
+    Are you lazy to type password for `sudo`? Then you can use the shell feature. Behind the shell prompt, all the commands are the same as the CLI mode, but no need to type the script name (*i.e.*, `host-switch` should be stripped).
 
         $ sudo host-switch shell
 
