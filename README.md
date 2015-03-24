@@ -65,7 +65,7 @@ Usage
 
         $ sudo host-switch on foo STAGING
 
-    Turn off all host setting (will use global DNS lookup)
+    Turn off all local host setting (will use global DNS lookup)
 
         $ sudo host-switch all-off foo
 
