@@ -1,9 +1,9 @@
 host-switch
-====
+===========
 A CLI tool to easily switch between different hosts settings
 
 Commands
-----
+--------
     $ host-switch help
     Usage:
         host-switch                     show current setting
@@ -13,13 +13,13 @@ Commands
         host-switch on <set> <group>    (root) to switch <group> hosts setting ON
 
 Definition
-----
+----------
 * __GROUP__: indicate one specific setting of some hostnames
 * __SET__: indicate an aggregation of hosts. You can define several setting __*group*__ for one __*set*__, but only one __*group*__ setting can be activated simultaneously.
 
 
 Usage
-----
+-----
 0. For example, I have two host-set in my daily development, say _foo_ and _bar_.
 
 1. So I prepare my `/etc/hosts` file as the following formats:
@@ -74,5 +74,5 @@ Usage
         $ sudo host-switch shell
 
 License
-----
+-------
 FreeBSD License
