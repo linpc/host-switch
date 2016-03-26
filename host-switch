@@ -413,6 +413,12 @@ shell_parse()
 	shift
 	do_on $@
 	return $?
+    elif [ "$1" = 'reload' ]; then
+	shift
+        sets=""
+        groups=""
+	look_up_group 0
+	return $?
     else
 	error "unknown command"
 	return 1
